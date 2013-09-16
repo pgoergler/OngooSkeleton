@@ -1,6 +1,6 @@
 {
-    "name": "pgoergler/ongoo-skeleton",
-    "description": "A pre-configured skeletong for ongoo",
+    "name": "ongoo/skeleton",
+    "description": "A pre-configured skeleton for ongoo",
     "license": "MIT",
     "type": "project",
     "repositories": [
