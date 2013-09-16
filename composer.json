@@ -1,7 +1,8 @@
 {
     "name": "ongoo/skeleton",
     "description": "A pre-configured skeleton for ongoo",
-    "license": "MIT",
+    "homepage": "",
+    "license":  "MIT",
     "type": "project",
     "repositories": [
         {
