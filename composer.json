@@ -1,35 +1,9 @@
 {
     "name": "ongoo/ongoo-skeleton",
     "description": "A pre-configured skeleton for ongoo",
-    "homepage": "",
+    "homepage": "https://github.com/pgoergler/OngooSkeleton",
     "license":  "MIT",
     "type": "project",
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/pgoergler/Quartz"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/pgoergler/QuartzServiceProvider"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/pgoergler/QuartzGuardServiceProvider"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/pgoergler/Logging"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/pgoergler/LoggingServiceProvider"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/pgoergler/Ongoo"
-        }
-    ],
     "require": {
         "php": ">=5.3.3",
         "atoum/atoum": "dev-master",
