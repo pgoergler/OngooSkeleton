@@ -1,5 +1,7 @@
 <?php
+
 include __DIR__ . '/../bootstrap/constantes.php';
+
 $app = include __BOOTSTRAP_DIR . '/initialize.php';
 $app['debug'] = true;
 $app['application.mode'] = 'dev';
@@ -10,5 +12,4 @@ $app['bundle.register']('ProjectName', true);
 $app['bundle.register.menu']('ProjectName');
 
 \Ongoo\Core\Configuration::getInstance()->set('application', $app);
-
 $app->run();
