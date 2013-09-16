@@ -1,0 +1,5 @@
+{% spaceless %}
+    {% autoescape false %}
+        {{ array|json_encode }}
+    {% endautoescape %}
+{% endspaceless %}

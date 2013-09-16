@@ -1,0 +1,9 @@
+{% spaceless %}
+<li class="{{ menu.infos.active ? 'active' : '' }}" id="{{ id }}">
+    {% if menu.infos.url is defined %}
+        <a href="{{ menu.infos.url }}"{% if menu.infos.id is defined %}id="{{ menu.infos.id }}"{% endif %}>{{menu.infos.title}}</a>
+    {% else %}
+        <a{% if menu.infos.id is defined %}id="{{ menu.infos.id }}"{% endif %}>{{menu.infos.title}}</a>
+    {% endif %}
+</li>
+{% endspaceless %}

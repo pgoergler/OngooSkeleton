@@ -1,0 +1,54 @@
+{
+    "name": "pgoergler/ongoo-skeleton",
+    "description": "A pre-configured skeletong for ongoo",
+    "license": "MIT",
+    "type": "project",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/pgoergler/Quartz"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/pgoergler/QuartzServiceProvider"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/pgoergler/QuartzGuardServiceProvider"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/pgoergler/Logging"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/pgoergler/LoggingServiceProvider"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/pgoergler/Ongoo"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "atoum/atoum": "dev-master",
+        "silex/silex": "1.0.*@dev",
+        "twig/twig": "dev-master",
+        "symfony/config": "~2.3",
+        "symfony/console": "dev-master",
+        "symfony/finder": "dev-master",
+        "symfony/process": "dev-master",
+        "symfony/translation": "~2.3",
+        "symfony/twig-bridge": "~2.3",
+        "symfony/yaml": "~2.3",
+        "quartz/quartz": "dev-master",
+        "quartz/quartz-service-provider": "dev-master",
+        "quartz/quartz-guard-service-provider": "dev-master",
+        "logging/logging": "dev-master",
+        "logging/logging-service-provider": "dev-master",
+        "ongoo/ongoo": "dev-master"
+    },
+    "autoload": {
+        "psr-0": {"": "src/"}
+    }
+}

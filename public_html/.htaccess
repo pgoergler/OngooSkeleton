@@ -1,0 +1,11 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{HTTP_HOST} \.localhost$
+  RewriteRule ^(.*)$ frontend_dev.php [QSA,L]
+
+  RewriteCond %{REQUEST_FILENAME} !-f
+  # no, so we redirect to our front web controller
+  RewriteRule ^(.*)$ frontend.php [QSA,L]
+</IfModule>

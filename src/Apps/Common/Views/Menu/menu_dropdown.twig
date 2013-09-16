@@ -1,0 +1,12 @@
+<li class="dropdown {{ menu.infos.active ? 'active' : '' }}" id="{{ id }}">
+    <a class="dropdown-toggle" data-toggle="dropdown" href="#"{% if menu.infos.id is defined %}id="{{ menu.infos.id }}"{% endif %}>{{menu.infos.title}}<b class="caret"></b></a>
+    <ul class="dropdown-menu">
+        {% for id, submenu in menu.menus %}
+            {% if submenu == 'divider' %}
+                <li class="divider-vertical"></li>
+            {% elseif 'template' in submenu.infos|keys %}
+                {% include "@Common/Menu/" ~ submenu.infos.template with {'id': id, 'menu': submenu} %}
+            {% endif %}
+        {% endfor %}
+    </ul>
+</li>
