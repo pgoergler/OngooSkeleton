@@ -26,12 +26,6 @@ foreach ($dirs as $alias => $const)
     $app['dir_' . $alias] = $const;
 }
 
-$app['now'] = $app->protect(function(){
-    return new \DateTime();
-});
-
 $app['silex.classloader'] = $loader;
-
-require __DIR__ . '/../lib/functions.php';
 
 return $app;
