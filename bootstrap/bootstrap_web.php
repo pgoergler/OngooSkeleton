@@ -4,13 +4,6 @@ $app->register(new \Ongoo\Silex\OngooServiceProvider(), array(
     'bundle.include_routes' => true,
 ));
 
-$app->register(new Silex\Provider\TwigServiceProvider(), array());
-
-$app->register(new Silex\Provider\UrlGeneratorServiceProvider());
-
-$app->register(new \Ongoo\Twig\TwigOngooExtensionProvider(), array());
-
-
 /*
 // ENABLE TRANSLATION
 $app->register(new Silex\Provider\TranslationServiceProvider(), array(
@@ -34,6 +27,12 @@ $app->before(function(\Symfony\Component\HttpFoundation\Request $request) use(&$
                 $app['translator']->setLocale($app['session']->get('_locale'));
             });
  */
+
+$app->register(new Silex\Provider\UrlGeneratorServiceProvider());
+
+$app->register(new Silex\Provider\TwigServiceProvider(), array());
+
+$app->register(new \Ongoo\Twig\TwigOngooExtensionProvider(), array());
 
 $app->register(new \Logging\LoggingServiceProvider\LoggingServiceProvider(), array(
     'ongoo.loggers' => $app['configuration']->get('Loggers'),
