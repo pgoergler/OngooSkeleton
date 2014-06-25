@@ -24,7 +24,7 @@ class QuartzModelTask extends \Ongoo\Core\Task
         $modelName = $input->getArgument('model_name');
         $regex = '#^\\\\(?P<namespace>.*)\\\\(?P<model>.*?)$#';
 
-        if( !preg_match($regex, $modelName, $m) )
+        if (!preg_match($regex, $modelName, $m))
         {
             $output->writeln("<info>Model class name should match \\\<Namespace>\\\<ModelClassname> got $modelName</info>");
             return;
@@ -34,14 +34,14 @@ class QuartzModelTask extends \Ongoo\Core\Task
         $model = $m['model'];
 
         $replace = array(
-                '%namespace%' => $namespace,
-                '%namespace|lower%' => strtolower($namespace),
-                '%model%' => $model,
-                '%model|lower%' => strtolower($model)
-            );
+            '%namespace%' => $namespace,
+            '%namespace|lower%' => strtolower($namespace),
+            '%model%' => $model,
+            '%model|lower%' => strtolower($model)
+        );
 
-        $path = __ROOT_DIR . '/' . str_replace("\\", DIRECTORY_SEPARATOR, $namespace);
-        if( !is_dir($path) )
+        $path = __ROOT_DIR . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . str_replace("\\", DIRECTORY_SEPARATOR, $namespace);
+        if (!is_dir($path))
         {
             mkdir($path, 0755);
         }
@@ -53,7 +53,7 @@ class QuartzModelTask extends \Ongoo\Core\Task
 
 
         $path .= '/Table';
-        if( !is_dir($path) )
+        if (!is_dir($path))
         {
             mkdir($path, 0755);
         }
@@ -64,7 +64,7 @@ class QuartzModelTask extends \Ongoo\Core\Task
         $output->writeln("<info>\\${namespace}\\Table\\${model}Table</info> created in $tableFile.");
 
         $path .= '/Base';
-        if( !is_dir($path) )
+        if (!is_dir($path))
         {
             mkdir($path, 0755);
         }
@@ -72,8 +72,6 @@ class QuartzModelTask extends \Ongoo\Core\Task
         $content = strtr($this->getTableBaseTemplate(), $replace);
         file_put_contents($baseFile, $content);
         $output->writeln("<info>\\${namespace}\\Table\\Base\\Base${model}Table</info> created in $baseFile.");
-
-
     }
 
     public function getModelTemplate()

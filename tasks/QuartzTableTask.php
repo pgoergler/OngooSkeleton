@@ -9,7 +9,6 @@ namespace Tasks;
  */
 class QuartzTableTask extends \Ongoo\Core\Task
 {
-
     protected function configure()
     {
         parent::configure();
@@ -19,47 +18,67 @@ class QuartzTableTask extends \Ongoo\Core\Task
                 ->addOption('create', null, \Symfony\Component\Console\Input\InputOption::VALUE_NONE, 'Create the table')
                 ->addOption('drop', null, \Symfony\Component\Console\Input\InputOption::VALUE_NONE, 'Drop the table')
                 ->addOption('cascade', null, \Symfony\Component\Console\Input\InputOption::VALUE_NONE, 'Drop the table in cascade')
+                ->addOption('silence', null, \Symfony\Component\Console\Input\InputOption::VALUE_NONE, 'Discard any output')
         ;
     }
 
     protected function process(\Symfony\Component\Console\Input\InputInterface $input, \Symfony\Component\Console\Output\OutputInterface $output)
     {
+        $silence = $input->getOption('silence');
+        if( $silence )
+        {
+            $this->output = null;
+        }
         try
         {
             $classname = $input->getArgument('classname_or_dir');
 
             if (is_dir($classname))
             {
-                $dir = $classname;
-                $finder = new \Symfony\Component\Finder\Finder();
-                $iterator = $finder->files()->name('*.php'); //->notName('*Table.php');
-                // $iterator->depth('== 0');
-                $iterator->sortByName()->in($dir);
-
-                foreach ($iterator as $file)
-                {
-                    $classes = \get_declared_php_classes($file);
-                    foreach ($classes as $class)
-                    {
-                        $clazz = new \ReflectionClass($class);
-                        if ($clazz->IsInstantiable() && $clazz->isSubclassOf('\Quartz\Object\Entity'))
-                        {
-                            $table = $this->app['orm']->getTable($class);
-                            $this->createDrop($table, $input->getOption('create'), $input->getOption('drop'), $input->getOption('cascade'));
-                        }
-                    }
-                }
+                $this->processDirectory($classname, $input->getOption('create'), $input->getOption('drop'), $input->getOption('cascade'));
             } else
             {
-                $table = $this->app['orm']->getTable($classname);
-
-                $this->createDrop($table, $input->getOption('create'), $input->getOption('drop'), $input->getOption('cascade'));
+                $this->processClassname($classname, $input->getOption('create'), $input->getOption('drop'), $input->getOption('cascade'));
             }
         } catch (\Exception $e)
         {
             $output->writeln("<error>" . $e->getMessage() . "</error>");
             $this->app['logger']->error($e);
         }
+    }
+
+    public function processDirectory($dir, $create = true, $drop = true, $cascade = true)
+    {
+        $finder = new \Symfony\Component\Finder\Finder();
+        $iterator = $finder->files()->name('*.php'); //->notName('*Table.php');
+        // $iterator->depth('== 0');
+        $iterator->sortByName()->in($dir);
+
+        $created = array();
+        foreach ($iterator as $file)
+        {
+            $classes = \get_declared_php_classes($file);
+            foreach ($classes as $class)
+            {
+                $clazz = new \ReflectionClass($class);
+                if ($clazz->IsInstantiable() && $clazz->isSubclassOf('\Quartz\Object\Table'))
+                {
+                    //$table = $this->app['orm']->getTable($class);
+                    $table = new $class();
+                    if( !in_array($table->getName(), $created) )
+                    {
+                        $this->createDrop($table, $create, $drop, $cascade);
+                        $created[] = $table->getName();
+                    }
+                }
+            }
+        }
+    }
+
+    public function processClassname($classname, $create = true, $drop = true, $cascade = true)
+    {
+        $table = $this->app['orm']->getTable($classname);
+        $this->createDrop($table, $create, $drop, $cascade);
     }
 
     protected function createDrop(\Quartz\Object\Table $table, $create, $drop, $cascade = false)

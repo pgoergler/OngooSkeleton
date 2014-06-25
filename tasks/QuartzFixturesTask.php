@@ -24,39 +24,28 @@ class QuartzFixturesTask extends \Ongoo\Core\Task
                 ->addOption('drop', null, \Symfony\Component\Console\Input\InputOption::VALUE_NONE, 'Drop current data in the database')
                 ->addOption('update', null, \Symfony\Component\Console\Input\InputOption::VALUE_NONE, 'Use finder key to update entity or insert')
                 ->addOption('dry-run', null, \Symfony\Component\Console\Input\InputOption::VALUE_NONE, 'Dry run')
+                ->addOption('silence', null, \Symfony\Component\Console\Input\InputOption::VALUE_NONE, 'Discard any output')
         ;
     }
 
     protected function process(\Symfony\Component\Console\Input\InputInterface $input, \Symfony\Component\Console\Output\OutputInterface $output)
     {
+        $silence = $input->getOption('silence');
         try
         {
             $filename = $input->getArgument('dir_or_file');
             if (is_dir($filename))
             {
-                //$files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($filename));
-
-                $finder = new \Symfony\Component\Finder\Finder();
-                $iterator = $finder->files();
-
-                if ($input->getOption('env') != 'test')
-                {
-                    $iterator->name('*.php');
-                }
-
-                $iterator->sortByName()
-                        ->in($filename);
-
-                foreach ($iterator as $file)
-                {
-                    $this->import($file, $input->getOption('drop'), $input, $output);
-                }
+                $this->importDirectory($filename, $input->getOption('drop'), $input->getOption('update'), $input->getOption('dry-run'), $silence ? null : $output,  $input->getOption('env') == 'test');
             } else if (file_exists($filename) && preg_match("#\.php\$#", $filename))
             {
-                $this->import($filename, $input->getOption('drop'), $input, $output);
+                $this->import($filename, $input->getOption('drop'), $input->getOption('update'), $input->getOption('dry-run'), $silence ? null : $output);
             } else
             {
-                $output->writeln("<error>The filename $filename must be a php file or a directory.</error>");
+                if( ! $silence )
+                {
+                    $output->writeln("<error>The filename $filename must be a php file or a directory.</error>");
+                }
             }
         } catch (\Exception $e)
         {
@@ -64,9 +53,27 @@ class QuartzFixturesTask extends \Ongoo\Core\Task
         }
     }
 
-    protected function import($filename, $drop, \Symfony\Component\Console\Input\InputInterface $input, \Symfony\Component\Console\Output\OutputInterface $output)
+    public function importDirectory($directory, $drop, $update, $dry_run = true, \Symfony\Component\Console\Output\OutputInterface $output = null, $isTest = false)
     {
-        $output->writeln("Importing <info>" . $filename . "</info>");
+        $finder = new \Symfony\Component\Finder\Finder();
+        $iterator = $finder->files();
+
+        if (!$isTest)
+        {
+            $iterator->name('*.php');
+        }
+
+        $iterator->sortByName()
+                ->in($directory);
+
+        foreach ($iterator as $file)
+        {
+            $this->import($file, $drop, $update, $dry_run, $output);
+        }
+    }
+
+    public function import($filename, $drop, $update, $dry_run = true, \Symfony\Component\Console\Output\OutputInterface $output = null)
+    {
         $app = $this->app;
         $data = include($filename);
         try
@@ -81,11 +88,17 @@ class QuartzFixturesTask extends \Ongoo\Core\Task
 
                 if ($drop)
                 {
-                    $output->write("Cleaning & ");
+                    if( $output )
+                    {
+                        $output->write("Cleaning & ");
+                    }
                     $table->delete();
                 }
 
-                $output->write("<info>" . $class . "</info>:");
+                if( $output )
+                {
+                    $output->write("<info>" . $class . "</info>:");
+                }
                 $nbUpdate = 0;
                 $nbInsert = 0;
                 $nbElements = 0;
@@ -93,7 +106,7 @@ class QuartzFixturesTask extends \Ongoo\Core\Task
                 {
                     $nbElements++;
                     $obj = new $class();
-                    if (!$drop && $input->getOption('update'))
+                    if (!$drop && $update)
                     {
                         $obj = $this->find($finder, $class, $conf) ? : $obj;
                     }
@@ -101,7 +114,6 @@ class QuartzFixturesTask extends \Ongoo\Core\Task
                     foreach ($conf as $k => $v)
                     {
                         $setter = $obj->getSetter($k);
-
                         if( is_object($v) )
                         {
                             $obj->$setter($v);
@@ -125,15 +137,25 @@ class QuartzFixturesTask extends \Ongoo\Core\Task
 
                     $this->refs[$refName] = $obj;
                 }
-                $output->write(" <info>$nbElements</info>row(s) <info>$nbInsert</info>insert, <info>$nbUpdate</info>update");
-                if ($input->getOption('dry-run'))
+                if( $output )
+                {
+                    $output->write(" <info>$nbElements</info>row(s) <info>$nbInsert</info>insert, <info>$nbUpdate</info>update");
+                }
+
+                if ($dry_run)
                 {
                     $table->rollback();
-                    $output->writeln(" <comment>not commited</comment>");
+                    if( $output )
+                    {
+                        $output->writeln(" <comment>not commited</comment>");
+                    }
                 } else
                 {
                     $table->commit();
-                    $output->writeln(" <info>commited</info>");
+                    if( $output )
+                    {
+                        $output->writeln(" <info>commited</info>");
+                    }
                 }
             }
         } catch (\Exception $e)
@@ -155,7 +177,10 @@ class QuartzFixturesTask extends \Ongoo\Core\Task
             if (!isset($array[$field]))
             {
                 $array[$field] = null;
-            } else if (preg_match('/##(REF|ref)(@(?P<reference>.*?))?##(?P<options>.*?##find:one,field:.*?)$/i', $array[$field], $m))
+            //} else if (preg_match('/##(REF|ref)(@(?P<reference>.*?))?##(?P<options>.*?##find:one,field:.*?)$/i', $array[$field], $m))
+            //{
+            //    $array[$field] = $this->getReferedObject(isset($m['reference']) ? $m['reference'] : rand(1,99999), $m['options']);
+            } else if (preg_match('/##(REF|ref)(@(?P<reference>.*?))?##(?P<options>.*?)$/i', $array[$field], $m))
             {
                 $array[$field] = $this->getReferedObject(isset($m['reference']) ? $m['reference'] : rand(1,99999), $m['options']);
             }
@@ -178,6 +203,7 @@ class QuartzFixturesTask extends \Ongoo\Core\Task
 
         if (preg_match("@^$regexModel##$regexCriteria##$regexFind$@i", $options, $extract))
         {
+            $this->app['logger']->debug($extract);
             $model = $extract['model'];
             $criteria = json_decode(str_replace("$boundary%diez%$boundary", '#', $extract['criteria']), true);
             $find = isset($extract['find']) ? $extract['find'] : 'one';
