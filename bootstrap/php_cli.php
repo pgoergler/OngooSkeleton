@@ -4,7 +4,7 @@ include __DIR__ . '/constantes.php';
 
 $app = include __BOOTSTRAP_DIR . '/initialize.php';
 $app['debug'] = true;
-$app['application.mode'] = 'test';
+$app['application.mode'] = isset($application_mode) ? $application_mode : 'dev';
 include __BOOTSTRAP_DIR . '/bootstrap_cli.php';
 
 $app->boot();
@@ -14,7 +14,7 @@ $root->set('app', '');
 $app['logger.factory']->add($root, 'root');
 $app['logger'] = $root;
 
-$app['client_id'] = 'atoum';
+$app['client_id'] = 'cli';
 
 function get_declared_php_classes($file)
 {
@@ -34,3 +34,4 @@ function get_declared_php_classes($file)
 }
 
 \Ongoo\Core\Configuration::getInstance()->set('application', $app);
+return $app;

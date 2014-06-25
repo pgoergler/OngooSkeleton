@@ -12,4 +12,6 @@ $app['bundle.register']('ProjectName', true);
 $app['bundle.register.menu']('ProjectName');
 
 \Ongoo\Core\Configuration::getInstance()->set('application', $app);
+$brand = 'ProjectName';
+$app['configuration']->set('App.brand', $brand);
 $app->run();

@@ -14,6 +14,7 @@ $app->register(new Silex\Provider\TranslationServiceProvider(), array(
 $app['translator'] = $app->share($app->extend('translator', function($translator, $app) {
     $translator->addLoader('yaml', new \Symfony\Component\Translation\Loader\YamlFileLoader());
     $translator->addResource('yaml', __LOCALES_DIR .'/fr.yml', 'fr_FR');
+    $translator->addResource('yaml', __LOCALES_DIR . '/en.yml', 'en_GB');
     return $translator;
 }));
 $app->before(function(\Symfony\Component\HttpFoundation\Request $request) use(&$app)
@@ -60,6 +61,5 @@ $app['session.activate'] = $app->protect(function() use (&$app)
 {
     $app['session']->start();
 });
-
 
 return $app;
