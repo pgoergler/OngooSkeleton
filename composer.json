@@ -19,6 +19,7 @@
         "quartz/quartz": "dev-master",
         "quartz/quartz-service-provider": "dev-master",
         "quartz/quartz-guard-service-provider": "dev-master",
+        "quartz/quartz-form-validator": "dev-master",
         "logging/logging": "dev-master",
         "logging/logging-service-provider": "dev-master",
         "ongoo/ongoo": "dev-master"
