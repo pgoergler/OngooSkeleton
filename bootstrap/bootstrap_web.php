@@ -4,7 +4,6 @@ $app->register(new \Ongoo\Silex\OngooServiceProvider(), array(
     'bundle.include_routes' => true,
 ));
 
-/*
 // ENABLE TRANSLATION
 $app->register(new Silex\Provider\TranslationServiceProvider(), array(
     'locale_fallback' => 'en_GB',
@@ -27,7 +26,6 @@ $app->before(function(\Symfony\Component\HttpFoundation\Request $request) use(&$
                 }
                 $app['translator']->setLocale($app['session']->get('_locale'));
             });
- */
 
 $app->register(new Silex\Provider\UrlGeneratorServiceProvider());
 
