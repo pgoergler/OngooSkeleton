@@ -22,20 +22,22 @@ function get_declared_php_classes($file)
 
 $application = new \Symfony\Component\Console\Application();
 
-$files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(__TASKS_DIR));
-foreach ($files as $file)
+$finder = new \Symfony\Component\Finder\Finder();
+$finder->ignoreUnreadableDirs()
+        ->in(__TASKS_DIR)
+        ->in(__APPS_DIR . '/*/Tasks')
+        ->name('*.php');
+
+foreach( $finder as $file )
 {
-    if (preg_match("#Task\.php\$#", $file))
+    $classes = get_declared_php_classes($file);
+    foreach ($classes as $class)
     {
-        $classes = get_declared_php_classes($file);
-        foreach ($classes as $class)
+        $clazz = new ReflectionClass($class);
+        if ($clazz->IsInstantiable() && $clazz->isSubclassOf('\Ongoo\Core\Task'))
         {
-            $clazz = new ReflectionClass($class);
-            if ($clazz->IsInstantiable() && $clazz->isSubclassOf('\Ongoo\Core\Task'))
-            {
-                $obj = new $class($app);
-                $application->add($obj);
-            }
+            $obj = new $class($app);
+            $application->add($obj);
         }
     }
 }
